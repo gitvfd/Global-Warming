@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!--<script src="//d3js.org/d3.v3.min.js"></script>-->
+<script src="//d3js.org/d3.v4.min.js"></script>
+<script   src="https://code.jquery.com/jquery-1.12.4.min.js"   integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="   crossorigin="anonymous"></script> 
+
+<!--Tether is a JavaScript library for efficiently making an absolutely positioned element stay next to another element on the page. For example, you might want a tooltip or dialog to open, and remain, next to the relevant item on the page.-->
+<script src="https://www.atlasestateagents.co.uk/javascript/tether.min.js"></script>
+
+  <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/css/bootstrap.min.css" integrity="sha384-2hfp1SzUoho7/TsGGGDaFdsuuDL0LX2hnUp6VkX3CUQ2K4K+xjboZdsXyp4oUHZj" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/js/bootstrap.min.js" integrity="sha384-VjEeINv9OSwtWFLAtmc4JCtEJXXBub00gtSnszmspDLCtC0I4z4nqz7rEFbIZLLU" crossorigin="anonymous"></script>
+<style>
+* {
+   margin: 0;
+   padding: 0;
+   -moz-box-sizing: border-box;
+   -webkit-box-sizing: border-box;
+   box-sizing: border-box;
+}
+body{
+  max-width: 900px;
+  margin-right: auto;
+  margin-left: auto;
+  background-color:#fff;
+  font:18px 'Libre Baskerville';
+  color:#606060;
+}
+
+.leftcol, .rightcol {
+  float:left;
+  width:49%;
+  margin-right: 0.25%;
+  margin-left: 0.25%;
+}
+
+.pic{
+  width:100%;
+  height:auto;
+  margin-bottom:1%; 
+  margin-bottom:1%;
+}
+.label {
+  font-weight: bold;
+}
+
+.tile {
+  shape-rendering: crispEdges;
+}
+
+.axis line {
+  fill: none;
+  stroke: #d3d3d3;
+  shape-rendering: crispEdges;
+}
+.axis path {
+  display: none;
+}
+.axis text {
+  font: 12px sans-serif;
+  color:#606060;
+}
+
+
+.lightAbove {
+
+  font:12px 'Libre Baskerville' ;
+  font-weight:lighter;
+  fill : #ff0000;
+}
+
+.lightBelow{
+  font:12px 'Libre Baskerville';
+  font-weight:lighter;
+  fill : #4682b4;
+}
+.line {
+  fill: none;
+  stroke: #aaa;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-width: 1px;
+}
+
+.lineco2 {
+  fill: none;
+  stroke: #aaa;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-width: 2.5px;
+}
+.tooltipHeat {
+  position: absolute;
+  text-align: center;
+  width: auto;
+  height: auto;
+  padding: 8px;
+  margin-top: -20px;
+  font: 10px sans-serif;
+  background: #ddd;
+  pointer-events: none;
+}
+
+.legend{
+
+  font: 11px sans-serif;
+}
+
+.legend.label {
+  font: 11px sans-serif ;
+  font-style: italic;
+}
+
+
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+.focus{
+  position: absolute;
+  text-align: center;
+  width: auto;
+  height: auto;
+  padding: 8px;
+  margin-top: -20px;
+  font: 11px sans-serif;
+  background: #ddd;
+  pointer-events: none;
+
+}
+.focus circle {
+  fill: red;
+  stroke: red;/**#3f3f3f;**/
+  opacity: 0.5;
+}
+
+
+.focus text {
+  text-anchor: middle;
+  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+}
+
+.years {
+  fill: none;
+  stroke: #aaa;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-width: 0.25px;
+}
+
+.Year--hover {
+  /**stroke: #000;**/
+  stroke-width: 2px;
+}
+
+
+.voronoi path {
+  fill: none;
+  pointer-events: all;
+}
+
+.voronoi--show path {
+  stroke: red;
+  stroke-opacity: 0.2;
+}
+
+#form {
+  /**position: absolute;**/
+  top: 20px;
+  right: 30px;
+}
+
+.citation{
+
+  font:12px 'Libre Baskerville';
+  color:#606060;
+}
+
+
+
+
+
+@media (max-width: 650px) {
+  .leftcol, .rightcol {
+  float:left;
+  width:98%;
+  margin-right: 0.25%;
+  margin-left: 0.25%;
+}
+
+}
+</style>
+
+
+<body>
+  <h1>Global Warming?</h1>
+  </br>
+  <div>
+    <p>
+      Every month, the <a href="http://data.giss.nasa.gov/gistemp/" target="_blank">NASA</a> measures and publishes a record of monthly average temperature of the Earth. Data are acquired using more than <b>6&nbsp;000 meteorological stations</b> around the world. Thanks to advanced modelling they have been able to get estimations as far back as 1880 (there is no prior estimations as previous records didn't cover enough of the planet).
+    </p>
+    <p>
+      To be precise, what NASA publishes is not the absolute temperature but a deviation from the average, which they call <b>anomalies</b>.
+    </p>
+    <p>
+      For each month of the year, NASA calculates its average temperature over the 1951-1980 period. What is then published is the "distance" in degree celsius (°C ) between the recorded temperature for a month and this average. In the end, you know if for a given month, the Earth is colder or warmer than the "norm".
+    </p>
+  </div>
+  <div id="overtime"></div>
+  </br>
+  <div>
+    <p>
+      When it comes to climate, it is the long-term trends that matters. In the above figure, we see an on-going warming trend. Temperatures before 1940 are most of the time below the corresponding average for the month then between 1950 and 1980 they are oscillating around the average and from then they quickly increase to be in 2016 about 1 degree above the "norm".
+    </p>
+  </div>
+  <h2>
+    Same thing but different
+  </h2>
+  <div>
+    Looking at the above visualisation the increasing trend is obvious but how does it reflect on a yearly basis. The  below visualisation allows you to see how the trends evolve from one year to another. Red lines correspond to recent year while blue year correspond to older years.
+  </div>
+</br>
+  <div class="citation">
+    data for the months of September, October, November and December 2016 are estimates based on data for the previous month.
+  </div>
+  </br>
+  <div id="seasonalLinesLegend"></div>
+  <div id="seasonalLines"></div>
+  </br>
+  <label id="form" for="show-voronoi">
+    Show Voronoi
+    <input type="checkbox" id="show-voronoi" disabled>
+  </label>
+  </br>
+  <div>
+    Recent years much warmer than the norm.
+  </div>
+  </br>
+  <h2>
+    A more detailed view
+  </h2>
+  </br>
+  <form >
+    <input id="datesortButton" type="radio" class="selector" name="selector" value="dateSort" checked> 
+    Chronology
+    <br>
+    <input id="gapsortButton" type="radio" class="selector" name="selector" value="gapSort"> 
+    From warm to cool
+    <br>
+  </form>
+  </br>
+  <div class="colcontainer">
+    <div class="leftcol">
+      <div id="heatmapLegend"></div>
+      </br>
+      <div id="heatmap"></div>
+    </div>
+    <div class="rightcol">
+      <h2>
+        Why does it get warmer?
+      </h2>
+      </br>
+      <div>
+        <p>
+          The reasons behind the warming of the planet have been known for a long time. Back in 1824, Joseph Fourier recognized the existence of the <a href="https://en.wikipedia.org/wiki/Greenhouse_effect" target="_blank">greenhouse</a> phenomena. 
+        </p>
+      </div>
+      </br>
+      <div>
+        <i>
+          How does the greenhouse effect work? 
+        </i>
+      </div>  
+      </br>
+      <div>
+        The greenhouse effect mechanism is quite simple. 
+        <ul>
+          <li>
+            the sun emits some radiations. Some are reflected back by the atmosphere while some pass through it.
+          </li>
+        </br>
+          <li>
+            the Earth absorbs about 50% of the radiations that pass through the atmosphere while the other half is reflected out into space.
+          </li>
+        </br>
+          <li>
+            the absorbed radiation are converted to heat energy causing the emission of "infrared" radiation back to the atmosphere
+          </li>
+        </br>
+          <li>
+            some of the "infrared" radiation is absorbed by the greenhouse gas and re-emitted.
+          </li>
+        </ul>
+      </div>
+      </br>
+      <div>
+        The diagram below explains this principle in a simplified manner.
+      </div>
+      </br>
+      <img src="img/Greenhouse_effect2.jpg" class="pic"></img>
+      </br>
+      <div>
+        Greenhouse gases are important for Earth climate. Without them, the average temperature of Earth's surface would be about -18 °C, rather than the present average of 15 °C.
+      </div>
+      </br>
+      <div>
+        The problem comes from the fact that since the beginning of the industrial revolution, human activity has progressively increased the level of CO<sub>2</sub> - a greenhouse gas - in the atmosphere. Thus increasing the greenhouse effect and slowly warming the average temperature, which could have <b>dire</b> consequences for the various Earth ecosystems. 
+      </div>
+    </br>
+        <div>
+          It led Alexander Graham Bell to already advocate, in 1917,  the use of alternative energy sources .
+        </div>
+      </br>
+      <div>
+        If the causes and the risks are well-identified, are we taking the right measures to prevent this?
+      </div>
+    </div> 
+  </div>  
+
+  <img src="img/IMG_1675crop.jpg" class="pic"></img>
+  </br>
+  <h2>
+    A blind society
+  </h2>
+  </br>
+  <div>
+    <p>
+      Unfortunately, despite loud alerts by world renown scientists, no effective measures have been put into place yet and the total emissions of CO<sub>2</sub> emissions keep on increasing.
+    </p>
+
+  </br>
+  <div id="CO2emissions"></div>
+  </br>
+    <p>
+      In September 2016, the 400 parts of CO<sub>2</sub> particles per million (ppm) threshold have been reached for what seem a permanent manner as September is usually the month with the lowest concentration of CO<sub>2</sub> particles in the atmosphere.
+    </p>
+    <p>
+      400ppm is considered by a scientists to be the turning point in our fight against global warming. Once it is reached, controlling global warming will become more and more difficult. If we want to avoid an increase of catastrophic events, scientists think we should try to get back to a concentration of 350ppm of CO<sub>2</sub> in the atmosphere.
+    </p>
+    <p>
+      Let's start inverting the trend for CO<sub>2</sub> emissions and reduce our dependency towards fossil fuels.</br>
+      The <a href="http://www.cop21.gouv.fr/" target="_blank">COP 21</a> agreement as well as the <a href="" target="_blank">world city agreement</a> - both signed in 2015 - are some steps in the right direction. We need to make sure they are followed by actions.
+    </p>
+  </div>
+  <h2>
+    Credits
+  </h2>
+  <div>
+    <p>
+      NASA data:
+    </p>
+    <li class="citation">
+      GISTEMP Team, 2016: GISS Surface Temperature Analysis (GISTEMP). NASA Goddard Institute for Space Studies. Dataset accessed 20YY-MM-DD at http://data.giss.nasa.gov/gistemp/.
+    </li>
+  </br>
+    <p>
+      Global surface temperature change
+    </p>
+  </br>
+    <li class="citation">
+      Hansen, J., R. Ruedy, M. Sato, and K. Lo, 2010: Global surface temperature change, Rev. Geophys., 48, RG4004, doi:10.1029/2010RG000345.
+    </li>
+  </br>
+    <p>
+      OECD CO<sub>2</sub> data:
+    </p>
+    <li class="citation"> 
+    OECD (2016), Air and GHG emissions (indicator). doi: 10.1787/93d10cf7-en (Accessed on 27 September 2016)
+    </li>
+  </div>
+  <div>
+  </br>
+    <p>
+      fog icon:
+    </p>
+    <li class="citation">
+      fog by Luis Prado from the Noun Project
+    </li>
+  </br>
+    <p>
+      Greenhouse effect illustration:
+    </p>
+    <li class="citation">
+      http://www.dinosaurfact.net/extinction/greenhouseeffect.php
+    </li>
+  </br>
+    <p>
+      multiline chart:
+    </p>
+    <li class="citation"> 
+      https://bl.ocks.org/mbostock/8033015
+    </li>
+  </br>
+    <p>
+      Others:
+    </p>
+     <li class="citation"> 
+    https://en.wikipedia.org/wiki/Greenhouse_gas
+     </li> 
+  </br>
+    <li class="citation"> 
+     http://400.350.org/
+    </li>
+  </div>
+  </br>
+  <h2>
+    On the same topic
+  </h2>
+  <div>
+Nasa has released a <a href="http://earthobservatory.nasa.gov/blogs/earthmatters/2016/09/12/heres-how-the-warmest-august-in-136-years-looks-in-chart-form/?utm_content=buffercc30f&utm_medium=social&utm_source=twitter.com&utm_campaign=buffer" target="_blank">visualisation</a> presenting the same data but corrected to include seasonal patterns.
+  </div> 
+  <img src="http://earthobservatory.nasa.gov/blogs/earthmatters/files/2016/09/tempanoms_gis_august2016.gif" class="pic"></img>
+  </br>
+  <div>
+    Randall Munroe, in his blog <a href="http://xkcd.com" target="_blank">xkcd.com</a>, has drawn an amazing timeline of the earth's average temperature going back much further in time than I have above. The way he presented the information is just brillant, being the perfect combination of entertaining and smart.
+  </div>
+  <img src="http://imgs.xkcd.com/comics/earth_temperature_timeline.png" class="pic"></img>
+
+
+<script>
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+///////////////////////// Line Chart ////////////////////
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+
+var margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = document.getElementById('overtime').offsetWidth - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+var formatDateLine = d3.timeParse("%b-%Y"),
+    bisectDate = d3.bisector(function(d) { return d.date; }).left;
+var formatMonth = d3.timeParse("%B-%Y");
+
+var x = d3.scaleTime()
+    .range([0, width]);
+
+var y = d3.scaleLinear()
+    .range([height, 0]);
+
+var xAxis = d3.axisBottom(x);
+
+var yAxis = d3.axisLeft(y);
+
+var lineTemp = d3.line()
+    .curve(d3.curveCardinal)
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.value); });
+
+var svg = d3.select("#overtime").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.csv("dataD3.csv", type, function(error,data) {
+
+  //if (error) throw error;
+  data.forEach(function(d){
+    d.value=d.value/100;
+  })
+
+  data.sort(function(a, b){ return d3.ascending(a.date, b.date); })
+    x.domain(d3.extent(data, function(d) { return d.date; }));
+    y.domain([d3.min(data, function(d) { return d.value; }), d3.max(data, function(d) { return d.value; })]);
+  //y.domain(d3.extent(data, function(d) { return d.value; }));
+
+
+  svg.append("svg:image")
+        .attr("xlink:href", "img/noun_8675.svg")
+        .attr("width", width/8)
+        .attr("height", width/8)
+        .attr("x", 2*widthco2/20)
+        .attr("y",1.*widthco2/20)
+
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .append("text") 
+      .attr("transform", "rotate(0)")
+      .attr("x", 15)
+      .attr("y", 6)
+      .attr("dy", ".32em")
+      .style("text-anchor", "start")
+      .style("fill","#000")
+      .text("Distance to the norm in °C");;
+
+
+  svg.append("path")
+      .datum(data)
+      .attr("class", "line")
+      .attr("d", lineTemp);
+
+
+  svg.append("line")
+      .attr("class", "line")
+      .attr("x1",x(formatDateLine("Jan-1880")))
+      .attr("x2",x(formatDateLine("Aug-2016")))
+      .attr("y1",y(0))
+      .attr("y2",y(0))
+      .style("stroke-dasharray", "2,2")
+      .style("stroke-width", "1.0px")
+      .style("stroke", "#696969");
+
+ 
+   svg.append("text") 
+   .attr("class","lightAbove")
+      .attr("transform", "rotate(0)")
+      .attr("x", x(formatDateLine("Jan-1920")))
+      .attr("y", y(0.6))
+      .attr("dy", ".0em")
+      .text("TEMPERATURE FOR THE MONTH IS ABOVE");
+   svg.append("text") 
+   .attr("class","lightAbove")
+      .attr("transform", "rotate(0)")
+      .attr("x", x(formatDateLine("Jan-1920")))
+      .attr("y", y(0.6))
+      .attr("dy", "1em")
+      .text("THE AVERAGE TEMPERATURE FOR THIS MONTH");     
+    svg.append("text") 
+   .attr("class","lightBelow")
+      .attr("transform", "rotate(0)")
+      .attr("x", x(formatDateLine("Jan-1920")))
+      .attr("y", y(-0.5))
+      .attr("dy", ".0em")
+      .text("TEMPERATURE FOR THE MONTH IS BELOW");
+    svg.append("text") 
+   .attr("class","lightBelow")
+      .attr("transform", "rotate(0)")
+      .attr("x", x(formatDateLine("Jan-1920")))
+      .attr("y", y(-0.5))
+      .attr("dy", "1em")
+      .text("THE AVERAGE TEMPERATURE FOR THIS MONTH");
+
+  var focus = svg.append("g")
+      .attr("class", "focus")
+      .style("display", "none");
+
+  focus.append("circle")
+      .attr("r", 2.5);
+
+  focus.append("text")
+      .attr("x", -50)
+      .attr("y", 20)
+      .attr("dy", ".35em");
+
+  svg.append("rect")
+      .attr("class", "overlay")
+      .attr("width", width)
+      .attr("height", height)
+      .on("mouseover", function() { focus.style("display", null); })
+      .on("mouseout", function() { focus.style("display", "none"); })
+      .on("mousemove", mousemove);
+  
+  function mousemove() {
+    var x0 = x.invert(d3.mouse(this)[0]),
+        i = bisectDate(data, x0, 1),
+        d0 = data[i - 1],
+        d1 = data[i],
+        d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+    var formatDate= d3.timeFormat("%b-%Y");
+    focus.attr("transform", "translate(" + x(d.date) + "," + y(d.value) + ")");
+    //focus.select("text").text(formatDate(d.date) + ": "+ d.value + " °C")
+    focus.select("text").text( formatDate(d.date) + " : " + d.value  + " °C"); // FORMAT DATE IN POP UP
+  }
+});
+
+
+function type(d) {
+  d.date = formatDateLine(d.date);
+  d.close = +d.close;
+  return d;
+}
+
+
+</script>
+
+<script>
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+///////////////////////// Heatmap Chart ////////////////////
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+if(window.innerWidth<650){
+  var squareDim=15;
+}else{
+  var squareDim=20;
+}
+
+var margin_size= (document.getElementById('heatmap').offsetWidth - 12*squareDim)/2;
+//var margin_size= (window.innerWidth/2 - 12*squareDim)/2; // previous size measurement based on whole window width changed because have set the max width to 960 px
+
+var heightSquareLegend = 3*squareDim;
+
+var formatDate = d3.timeParse("%b-%Y");
+  /// read data///
+  
+  d3.csv("dataD3.csv", function(data) {
+
+    counter=0;
+
+    data.forEach(function (d){
+      d.value=d.value/100;
+      counter++;})
+    if (Number.isInteger(counter/12))
+      numberRow= counter/12;
+    else
+      numberRow= Math.trunc(counter/12)+1;
+
+
+    data=data.sort(function(a, b){ return d3.ascending(formatDate(a.date), formatDate(b.date)); })
+
+    /** SET UP SQUARE SVG **/
+      var widthSquare = document.getElementById('heatmap').offsetWidth;;
+
+
+      var Legend = d3.select("#heatmapLegend").append("svg")
+          .attr("width", widthSquare)
+          .attr("height", heightSquareLegend);
+
+      var svgMap = d3.select("#heatmap").append("svg")
+          .attr("width", widthSquare)
+          .attr("height", numberRow*squareDim+50);
+
+
+      /////////////////////////////////////////////////////////
+      /////////////////// Color Scales for heatmap ////////////
+      /////////////////////////////////////////////////////////
+
+    z = d3.scaleLinear().range(["steelblue", "red"]);
+    z.domain([d3.min(data, function(d) { return d.value; }), d3.max(data, function(d) { return d.value; })]);
+
+      /////////////////////////////////////////////////////////
+      /////////////////// Draw legend Function /////////////////////
+      /////////////////////////////////////////////////////////
+ 
+
+     // Add a legend for the color values.
+    var legend = Legend.selectAll(".legend")
+        //.data(z.ticks(6).slice(1).reverse())
+        .data([-1.10,-0.90,-0.70,-0.50,-0.30,-0.1,0.1,0.30,0.50,0.70,0.90,1.10])
+        .enter().append("g")
+        .attr("class", "legend")
+        .attr("transform", function(d, i) { return "translate(" + (margin_size + squareDim*i) + "," + (0.75*squareDim ) + ")"; });
+
+    legend.append("rect")
+        .attr("class", "legend")
+        .attr("width", squareDim)
+        .attr("height", squareDim)
+        .style("fill", z);
+
+    legend.append("text")
+        .attr("class", "legend")
+        .attr("x", squareDim/2)
+        .attr("dx", "-1em")
+        .attr("y", 1.3*squareDim)
+        .attr("dy", ".35em")
+        .text(String);
+
+    Legend.append("text")
+        .attr("class", " legend label ")
+        .attr("x", margin_size )
+        .attr("dy", "0.75em")
+        .text(function(){
+         if(window.innerWidth<650){
+            return "Distance to average in °C"
+          }else{
+            return "Distance to the average temperature for the month in °C";
+          }
+          });
+
+
+
+      /////////////////////////////////////////////////////////
+      /////////////////// Draw the tiles           ////////////
+      /////////////////////////////////////////////////////////
+    svgMap.selectAll(".tile")
+      .data(data)
+      .enter().append("rect")
+      .attr("class", function(d) { return "rect" + d.rowNumber; })
+      .attr("x", function(d,i) { 
+        return margin_size+squareDim*(i%12) })
+      .attr("y", function(d,j) { 
+        return squareDim*Math.trunc(j/12); 
+      })
+      .attr("width", squareDim)
+      .attr("height", squareDim )
+      .style("fill", function(d) { return z(d.value); 
+      })
+      .attr("stroke-width",1)
+      .attr("stroke", "#DDE9EF")
+      .attr("text",function(d){return d.date;});
+   
+    svgMap.selectAll("rect")
+      .on("mouseover", mouseoverHeat)
+      .on("mousemove", mousemoveHeat)
+      .on("mouseout", mouseoutHeat);
+
+
+
+      /////////////////////////////////////////////////////////
+      /////////////////// sort by date             ////////////
+      /////////////////////////////////////////////////////////
+    
+    function dateSort(data){
+      data=data.sort(function(a, b){ return d3.ascending(formatDate(a.date), formatDate(b.date)); })
+
+      svgMap.selectAll("rect")
+        .data(data)
+        .transition()
+        .attr("x", function(d,i) { 
+          return margin_size+squareDim*(i%12) 
+        })
+        .attr("y", function(d,j) { 
+          return squareDim*Math.trunc(j/12); 
+        });
+    };
+
+      /////////////////////////////////////////////////////////
+      /////////////////// sort by gap ////////////
+      /////////////////////////////////////////////////////////
+
+    function gapSort(data){
+
+      svgMap.selectAll("rect")
+        .transition()
+        .attr("x", function(d) { 
+        return margin_size+squareDim*((d.rowNumber-1)%12) })
+        .attr("y", function(d) { 
+        return squareDim*Math.trunc((d.rowNumber-1)/12); 
+        });
+      
+    };
+
+
+
+      /////////////////////////////////////////////////////////
+      /////////////////// input radio button ////////////
+      /////////////////////////////////////////////////////////
+    d3.selectAll(".selector").on("change", change);
+    function change(){
+      if (this.value === "dateSort") {
+            dateSort(data);
+          }
+          else {
+            gapSort(data);
+      }
+    };
+
+
+      /////////////////////////////////////////////////////////
+      /////////////////// Tooltips ////////////
+      /////////////////////////////////////////////////////////
+
+    var div = d3.select("#heatmap").append("div")
+        .attr("class", "tooltipHeat")
+        .style("display", "none");
+
+
+    function mouseoverHeat() {
+      div.style("display", "inline");
+    }
+
+    function mousemoveHeat(d,i) {
+
+      div.html("<div style='font-size: 11px; text-align: center;'><span style='font-weight:bold'>" + d.date + "</span><br><span><i>Difference to the average temperature for " + d.variable+ "</i><span ></br>" + parseFloat(d.value) +" °C (Celsius degree)</span></div>")
+          .style("left", (d3.event.pageX)-100 + "px")
+          .style("top", (d3.event.pageY) -45+ "px");
+    }
+
+    function mouseoutHeat() {
+      div.style("display", "none");
+    }
+
+  });
+
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+///////////////////////// CO2 LineChart /////////////////
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+
+var f = d3.format(".1f");
+
+var marginco2 = {top: 10, right: 10, bottom: 25, left: 50},
+    widthco2 = document.getElementById('CO2emissions').offsetWidth - margin.left - margin.right,
+    heightco2 = 300 - margin.top - margin.bottom;
+
+var formatco2Line = d3.timeParse("%b-%Y"),
+    bisectDateco2 = d3.bisector(function(d) { return d.TIME; }).left;
+var formatYear = d3.timeParse("%Y");
+
+var xco2 = d3.scaleTime()
+    .range([0, widthco2]);
+
+var yco2 = d3.scaleLinear()
+    .range([heightco2, 0]);
+
+var xAxisco2 = d3.axisBottom(xco2);
+
+var yAxisco2 = d3.axisLeft(yco2);
+
+var lineco2 = d3.line()
+    .curve(d3.curveCardinal)
+    .defined(function(d) { return d; })
+    .x(function(d) {  return xco2(d.TIME); })
+    .y(function(d) {  return yco2(d.Value); });
+
+var svgco2 = d3.select("#CO2emissions").append("svg")
+    .attr("width", widthco2 + marginco2.left + marginco2.right)
+    .attr("height", heightco2 + marginco2.top + marginco2.bottom)
+  .append("g")
+    .attr("transform", "translate(" + marginco2.left + "," + marginco2.top + ")");
+
+d3.csv("DPLIVECO2_new.csv",typeCO2, function(error,dataco2) {
+  // if (error) return console.error(error);
+  dataco2.forEach(function(d){
+    d.Value=d.Value/1000;
+  })
+  
+  dataco2.sort(function(a, b){ return d3.ascending(a.TIME, b.TIME); })
+    xco2.domain(d3.extent(dataco2, function(d) { return d.TIME; }));
+    yco2.domain([d3.min(dataco2, function(d) { return d.Value; }), d3.max(dataco2, function(d) { return d.Value; })]);
+  //y.domain(d3.extent(data, function(d) { return d.value; }));
+
+  svgco2.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + heightco2 + ")")
+      .call(xAxisco2);
+
+  svgco2.append("g")
+      .attr("class", "y axis")
+      .call(yAxisco2)
+      .append("text") 
+      .attr("class", "axis axis--y")
+      .attr("transform", "rotate(0)")
+      .attr("x", 15)
+      .attr("y", 6)
+      .attr("dy", ".32em")
+      .style("text-anchor", "start")
+      .style("fill","#000")
+      .text("Billion tonnes of CO2 emitted");
+      
+  svgco2.append("path")
+      .datum(dataco2)
+      .attr("class", "lineco2")
+      .attr("d", lineco2);
+
+  svgco2.append("svg:image")
+        .attr("xlink:href", "img/noun_80282_cc.svg")
+        .attr("width", widthco2/5)
+        .attr("height", widthco2/5)
+        .attr("x", 15*widthco2/20)
+        .attr("y",2*widthco2/20)
+
+
+  var focusco2 = svgco2.append("g")
+      .attr("class", "focus")
+      .style("display", "none");
+
+  focusco2.append("circle")
+      .attr("r", 2.5);
+
+  focusco2.append("text")
+      .attr("x", -50)
+      .attr("y", 20)
+      .attr("dy", ".35em");
+
+  svgco2.append("rect")
+      .attr("class", "overlay")
+      .attr("width", widthco2)
+      .attr("height", heightco2)
+      .on("mouseover", function() { focusco2.style("display", null); })
+      .on("mouseout", function() { focusco2.style("display", "none"); })
+      .on("mousemove", mousemoveco2);
+  
+  function mousemoveco2() {
+    var x0 = xco2.invert(d3.mouse(this)[0]),
+        i = bisectDateco2(dataco2, x0, 1),
+        d0 = dataco2[i - 1],
+        d1 = dataco2[i],
+        d = x0 - d0.TIME > d1.TIME - x0 ? d1 : d0;
+
+
+    var formatDateCO2= d3.timeFormat("%b-%Y");
+
+    focusco2.attr("transform", "translate(" + xco2(d.TIME) + "," + yco2(d.Value) + ")");
+    focusco2.select("text").text( formatDateCO2(d.TIME) + " : " + f(d.Value) + " Bn tonnes of CO2");
+  }
+});
+
+
+function typeCO2(d) {
+  d.TIME = formatDateLine(d.TIME);
+  d.close = +d.close;
+  return d;
+}
+
+</script>
+<script>
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+///////////////////////// multiple LineChart /////////////////
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+
+var months,
+    monthKeys,
+    monthParse = d3.timeParse("%b");
+
+var svgSeason = d3.select("#seasonalLines").append("svg"),
+    marginSeason = {top: 20, right: 30, bottom: 30, left: 40},
+    widthSeason = document.getElementById('seasonalLines').offsetWidth  - marginSeason.left - marginSeason.right,
+    heightSeason = 600 - marginSeason.top - marginSeason.bottom;
+
+    svgSeason.attr("width", widthSeason + marginSeason.left + marginSeason.right)
+    .attr("height", heightSeason + marginSeason.top + marginSeason.bottom);
+    
+    gSeason = svgSeason.append("g").attr("transform", "translate(" + marginSeason.left + "," + marginSeason.top + ")");
+
+
+var xSeason = d3.scaleTime()
+    .range([0, widthSeason]);
+
+var ySeason = d3.scaleLinear()
+    .range([heightSeason, 0]);
+
+
+var zSeason = d3.scaleLinear().range(["steelblue", "red"])
+.domain([1880,2016]);
+
+var voronoi = d3.voronoi()
+    .x(function(d) { return xSeason(d.date); })
+    .y(function(d) { return ySeason(d.value); })
+    .extent([[-marginSeason.left, -marginSeason.top], [widthSeason + marginSeason.right, heightSeason + marginSeason.bottom]]);
+
+var line = d3.line()
+    .curve(d3.curveCardinal)
+    .defined(function(d) { return d; })
+    .x(function(d) { return xSeason(d.date); })
+    .y(function(d) { return ySeason(d.value); });
+
+d3.tsv("dataWideD3.tsv", type, function(error, data) {
+  if (error) throw error;
+
+  xSeason.domain(d3.extent(months));
+  //y.domain([-3,2]).nice();
+  ySeason.domain([d3.min(data, function(c) { return d3.max(c.values, function(d) { return d.value; }); }), d3.max(data, function(c) { return d3.max(c.values, function(d) { return d.value; }); })]).nice();
+
+
+  zSeason.domain([1880,2016]); // try to automatize this field
+
+  gSeason.append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", "translate(0," + heightSeason + ")")
+      .call(d3.axisBottom(xSeason));
+
+  gSeason.append("g")
+      .attr("class", "axis axis--y")
+      .call(d3.axisLeft(ySeason).ticks(20,".1f"))
+    .append("text")
+      .attr("x", 4)
+      .attr("y", 0.5)
+      .attr("dy", "0.32em")
+      .style("text-anchor", "start")
+      .style("fill", "#000")
+      .text("Distance to the norm in °C");
+
+
+
+  gSeason.append("g")
+      .attr("class", "years")
+    .selectAll("path")
+    .data(data)
+    .enter().append("path")
+      .attr("d", function(d) { d.line = this; return line(d.values); })
+    .style("stroke", function(d) { return zSeason(d.year); });
+    
+    gSeason.append("line")
+      .attr("class", "line")
+      .attr("x1",xSeason(monthParse("Jan")))
+      .attr("x2",xSeason(monthParse("Dec")))
+      .attr("y1",ySeason(0))
+      .attr("y2",ySeason(0))
+      .style("stroke-dasharray", "2,2")
+      .style("stroke-width", "1.0px")
+      .style("stroke", "#696969");
+ 
+     /**gSeason.append("text") 
+        .attr("transform", "rotate(0)")
+        .attr("x", xSeason(monthParse("Nov")))
+        .attr("y", ySeason(0.05))
+        .attr("dy", ".71em")
+        .style("fill", "#696969")
+        .text("\"Norm\"");**/
+
+ 
+     gSeason.append("text") 
+     .attr("class","lightAbove")
+        .attr("transform", "rotate(0)")
+        .attr("x", xSeason(monthParse("May")))
+        .attr("y", ySeason(0.6))
+        .attr("dy", ".0em")
+        .html("TEMPERATURE FOR THE MONTH IS ABOVE");
+     gSeason.append("text") 
+     .attr("class","lightAbove")
+        .attr("transform", "rotate(0)")
+        .attr("x", xSeason(monthParse("May")))
+        .attr("y", ySeason(0.6))
+        .attr("dy", "1em")
+        .html("THE AVERAGE TEMPERATURE FOR THIS MONTH");     
+      gSeason.append("text") 
+     .attr("class","lightBelow")
+        .attr("transform", "rotate(0)")
+        .attr("x", xSeason(monthParse("May")))
+        .attr("y", ySeason(-0.3))
+        .attr("dy", ".0em")
+        .text("TEMPERATURE FOR THE MONTH IS BELOW");
+      gSeason.append("text") 
+     .attr("class","lightBelow")
+        .attr("transform", "rotate(0)")
+        .attr("x", xSeason(monthParse("May")))
+        .attr("y", ySeason(-0.3))
+        .attr("dy", "1em")
+        .text("THE AVERAGE TEMPERATURE FOR THIS MONTH");
+   
+
+
+  var focus = gSeason.append("g")
+      .attr("transform", "translate(-100,-100)")
+      .attr("class", "focus");
+
+  focus.append("circle")
+      .attr("r", 3.5);
+
+  focus.append("text")
+      .attr("y", -10);
+
+  var voronoiGroup = gSeason.append("g")
+      .attr("class", "voronoi");
+
+  voronoiGroup.selectAll("path")
+    .data(voronoi.polygons(d3.merge(data.map(function(d) { return d.values; }))))
+    .enter().append("path")
+      .attr("d", function(d) { return d ? "M" + d.join("L") + "Z" : null; })
+      .on("mouseover", mouseover)
+      .on("mouseout", mouseout);
+
+  d3.select("#show-voronoi")
+      .property("disabled", false)
+      .on("change", function() { voronoiGroup.classed("voronoi--show", this.checked); });
+
+  function mouseover(d) {
+    d3.select(d.data.Year.line).classed("Year--hover", true);
+    d.data.Year.line.parentNode.appendChild(d.data.Year.line);
+    focus.attr("transform", "translate(" + xSeason(d.data.date) + "," + ySeason(d.data.value) + ")");
+    focus.select("text").text(d.data.Year.year + " : " + d.data.value + " °C");
+  }
+
+  function mouseout(d) {
+    d3.select(d.data.Year.line).classed("Year--hover", false);
+    focus.attr("transform", "translate(-100,-100)");
+  }
+});
+
+function type(d, i, columns) {
+  if (!months) monthKeys = columns.slice(1), months = monthKeys.map(monthParse);
+  var c = {year: d.year.replace(/ (msa|necta div|met necta|met div)$/i, ""), values: null};
+  c.values = monthKeys.map(function(k, i) { return {Year: c, date: months[i], value: d[k] / 100}; });
+  return c;
+}
+
+
+      /////////////////////////////////////////////////////////
+      /////////////////// Draw legend Function /////////////////////
+      /////////////////////////////////////////////////////////
+ 
+    var legendSeasonSize=20;
+
+  var margin_sizeSeason= (document.getElementById('seasonalLinesLegend').offsetWidth - 8*legendSeasonSize)/2;
+
+    var LegendSeason = d3.select("#seasonalLinesLegend").append("svg")
+          .attr("width", widthSeason)
+          .attr("height", 40);
+
+     // Add a legend for the color values.
+
+    var legendSeason = LegendSeason.selectAll(".legend")
+        //.data(z.ticks(6).slice(1).reverse())
+        .data([1880,1920,1960,2000,2016])
+        .enter().append("g")
+        .attr("class", "legend")
+        .attr("transform", function(d, i) { return "translate(" + (margin_sizeSeason + legendSeasonSize*2*i) + "," + (0.75*legendSeasonSize ) + ")"; });
+
+    legendSeason.append("rect")
+        .attr("class", "legend")
+        .attr("width", legendSeasonSize*2)
+        .attr("height", legendSeasonSize/5)
+        .style("fill", zSeason);
+
+    legendSeason.append("text")
+        .attr("class", "legend")
+        .attr("x", legendSeasonSize/2)
+        .attr("dx", "-1em")
+        .attr("y", 1*legendSeasonSize)
+        .attr("dy", ".35em")
+        .text(String);
+
+    /**legendSeason.append("text")
+        .attr("class", " legend label ")
+        .attr("x", margin_sizeSeason )
+        .attr("dy", "0.75em")
+        .text("Year");**/
+
+</script>
