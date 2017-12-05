@@ -2,15 +2,15 @@
 <meta charset="utf-8">
 
 <!--<script src="//d3js.org/d3.v3.min.js"></script>-->
-<script src="//d3js.org/d3.v4.min.js"></script>
-<script   src="https://code.jquery.com/jquery-1.12.4.min.js"   integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="   crossorigin="anonymous"></script> 
+<script src="libs/d3.v4.min.js"></script>
+<script   src="libs/jquery-1.7.2.min.js" ></script> 
 
 <!--Tether is a JavaScript library for efficiently making an absolutely positioned element stay next to another element on the page. For example, you might want a tooltip or dialog to open, and remain, next to the relevant item on the page.-->
 <script src="https://www.atlasestateagents.co.uk/javascript/tether.min.js"></script>
 
   <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/css/bootstrap.min.css" integrity="sha384-2hfp1SzUoho7/TsGGGDaFdsuuDL0LX2hnUp6VkX3CUQ2K4K+xjboZdsXyp4oUHZj" crossorigin="anonymous">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/js/bootstrap.min.js" integrity="sha384-VjEeINv9OSwtWFLAtmc4JCtEJXXBub00gtSnszmspDLCtC0I4z4nqz7rEFbIZLLU" crossorigin="anonymous"></script>
+<!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/css/bootstrap.min.css" integrity="sha384-2hfp1SzUoho7/TsGGGDaFdsuuDL0LX2hnUp6VkX3CUQ2K4K+xjboZdsXyp4oUHZj" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/js/bootstrap.min.js" integrity="sha384-VjEeINv9OSwtWFLAtmc4JCtEJXXBub00gtSnszmspDLCtC0I4z4nqz7rEFbIZLLU" crossorigin="anonymous"></script>-->
 <style>
 * {
    margin: 0;
@@ -457,15 +457,14 @@ var svg = d3.select("#overtime").append("svg")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 d3.csv("dataD3.csv", type, function(error,data) {
-
   //if (error) throw error;
   data.forEach(function(d){
-    d.value=d.value/100;
+    d.value=parseFloat(d.value);
   })
 
   data.sort(function(a, b){ return d3.ascending(a.date, b.date); })
     x.domain(d3.extent(data, function(d) { return d.date; }));
-    y.domain([d3.min(data, function(d) { return d.value; }), d3.max(data, function(d) { return d.value; })]);
+    y.domain([d3.min(data, function(d) { return parseFloat(d.value); }), d3.max(data, function(d) { return parseFloat(d.value); })]);
   //y.domain(d3.extent(data, function(d) { return d.value; }));
 
 
@@ -504,7 +503,7 @@ d3.csv("dataD3.csv", type, function(error,data) {
   svg.append("line")
       .attr("class", "line")
       .attr("x1",x(formatDateLine("Jan-1880")))
-      .attr("x2",x(formatDateLine("Aug-2016")))
+      .attr("x2",x(formatDateLine("Oct-2017")))
       .attr("y1",y(0))
       .attr("y2",y(0))
       .style("stroke-dasharray", "2,2")
@@ -568,9 +567,9 @@ d3.csv("dataD3.csv", type, function(error,data) {
         d1 = data[i],
         d = x0 - d0.date > d1.date - x0 ? d1 : d0;
     var formatDate= d3.timeFormat("%b-%Y");
-    focus.attr("transform", "translate(" + x(d.date) + "," + y(d.value) + ")");
+    focus.attr("transform", "translate(" + x(d.date) + "," + y(parseFloat(d.value)) + ")");
     //focus.select("text").text(formatDate(d.date) + ": "+ d.value + " °C")
-    focus.select("text").text( formatDate(d.date) + " : " + d.value  + " °C"); // FORMAT DATE IN POP UP
+    focus.select("text").text( formatDate(d.date) + " : " + parseFloat(d.value)  + " °C"); // FORMAT DATE IN POP UP
   }
 });
 
@@ -609,7 +608,7 @@ var formatDate = d3.timeParse("%b-%Y");
     counter=0;
 
     data.forEach(function (d){
-      d.value=d.value/100;
+      d.value=d.value;
       counter++;})
     if (Number.isInteger(counter/12))
       numberRow= counter/12;
@@ -637,7 +636,7 @@ var formatDate = d3.timeParse("%b-%Y");
       /////////////////////////////////////////////////////////
 
     z = d3.scaleLinear().range(["steelblue", "red"]);
-    z.domain([d3.min(data, function(d) { return d.value; }), d3.max(data, function(d) { return d.value; })]);
+    z.domain([d3.min(data, function(d) { return parseFloat(d.value); }), d3.max(data, function(d) { return parseFloat(d.value); })]);
 
       /////////////////////////////////////////////////////////
       /////////////////// Draw legend Function /////////////////////
@@ -694,7 +693,7 @@ var formatDate = d3.timeParse("%b-%Y");
       })
       .attr("width", squareDim)
       .attr("height", squareDim )
-      .style("fill", function(d) { return z(d.value); 
+      .style("fill", function(d) { return z(parseFloat(d.value)); 
       })
       .attr("stroke-width",1)
       .attr("stroke", "#DDE9EF")
@@ -740,7 +739,6 @@ var formatDate = d3.timeParse("%b-%Y");
         });
       
     };
-
 
 
       /////////////////////////////////////////////////////////
@@ -821,11 +819,12 @@ var svgco2 = d3.select("#CO2emissions").append("svg")
   .append("g")
     .attr("transform", "translate(" + marginco2.left + "," + marginco2.top + ")");
 
-d3.csv("DPLIVECO2_new.csv",typeCO2, function(error,dataco2) {
+d3.csv("DP_LIVE_CO2.csv",typeCO2, function(error,dataco2) {
   // if (error) return console.error(error);
   dataco2.forEach(function(d){
     d.Value=d.Value/1000;
   })
+  console.log(dataco2)
   
   dataco2.sort(function(a, b){ return d3.ascending(a.TIME, b.TIME); })
     xco2.domain(d3.extent(dataco2, function(d) { return d.TIME; }));
