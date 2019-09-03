@@ -819,7 +819,7 @@ var svgco2 = d3.select("#CO2emissions").append("svg")
   .append("g")
     .attr("transform", "translate(" + marginco2.left + "," + marginco2.top + ")");
 
-d3.csv("DP_LIVE_CO2.csv",typeCO2, function(error,dataco2) {
+d3.csv("DPLIVECO2_new.csv",typeCO2, function(error,dataco2) {
   // if (error) return console.error(error);
   dataco2.forEach(function(d){
     d.Value=d.Value/1000;
